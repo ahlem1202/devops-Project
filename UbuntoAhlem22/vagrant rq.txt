@@ -1,0 +1,4 @@
+vagrant init
+
+
+terminal vs code > vagrant up 

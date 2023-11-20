@@ -1,0 +1,101 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout from GitHub') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: 'AhlemZaghouani-5DS1-G3']], userRemoteConfigs: [[url: 'https://github.com/ahlem1202/5DS1-G3-KADDEM.git']]])
+            }
+        }
+        stage('Compile') {
+            steps {
+                dir('/var/lib/jenkins/workspace/KADDEM-Project-G3/kaddem/kaddem') {
+                    sh 'mvn compile'
+                }
+            }
+        }
+        stage('Package') {
+            steps {
+                dir('/var/lib/jenkins/workspace/KADDEM-Project-G3/kaddem/kaddem') {
+                    sh 'mvn package'
+                }
+            }
+        }
+        stage('Build docker image') {
+            steps {
+                script {
+                    def dockerfilePath = '/var/lib/jenkins/workspace/KADDEM-Project-G3/kaddem/kaddem/target/Dockerfile'
+                    def dockerImageTag = 'ahlemzaghouani-5ds1-g3-kaddem/kaddemproject'
+                    
+                    sh "docker build -t ${dockerImageTag} -f ${dockerfilePath} /var/lib/jenkins/workspace/KADDEM-Project-G3/kaddem/kaddem/target"
+                   
+                }
+            }
+        }
+        stage('Push docker image') {
+            steps {
+                script {
+                
+}
+                }
+            }
+        }
+        
+    }
+}
+
+
+
+
+
+  stage('Compile') {
+            steps {
+                dir('/var/lib/jenkins/workspace/KADDEM-Project-G3/kaddem/kaddem') {
+                    sh 'mvn compile'
+                }
+            }
+        }
+        stage('Package') {
+            steps {
+                dir('/var/lib/jenkins/workspace/KADDEM-Project-G3/kaddem/kaddem') {
+                    sh 'mvn package'
+                }
+            }
+        }
+        stage('Build docker image') {
+            steps {
+                script {
+                    def dockerfilePath = '/var/lib/jenkins/workspace/KADDEM-Project-G3/kaddem/kaddem/target/Dockerfile'
+                    def dockerImageTag = 'ahlemzaghouani-5ds1-g3-kaddem/kaddemproject'
+
+                    dockerImage = docker.build("${registry}/${dockerImageTag}:${BUILD_NUMBER}", "-f ${dockerfilePath} /var/lib/jenkins/workspace/KADDEM-Project-G3/kaddem/kaddem/target")
+                    
+                }
+            }
+        }
+        stage('Push docker image') {
+            steps {
+                script {
+                    docker.withRegistry('', registryCredential) {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+
+
+
+
+stage('Push docker image') {
+            steps {
+                script {
+                withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
+                sh "docker login -u ahlemzagh -p ${dockerhubpwd}"
+
+                    
+                }
+                sh 'docker push ahlemzaghouani-5ds1-g3-kaddem/kaddemproject'
+                }
+                }
+            }
+
+
